@@ -1,0 +1,17 @@
+#lang racket
+(require sicp-pict)
+(define (graph-iteration a x0 n)
+  (define (iter count lis x y)
+    (if (> count n)
+        (cons (make-segment (make-vect 0.0 0.0) (make-vect 1.0 1.0)) (cons (make-segment (make-vect 0.0 0.0) (make-vect 1.0 0.0)) (cons (make-segment (make-vect 0.0 0.0) (make-vect 0.0 1.0))lis)))
+        (let ((vert-line (make-segment (make-vect x y) (make-vect x (* a x (- 1 x))))))
+          (set! y (* a x (- 1 x)))
+          (let ((horiz-line (make-segment (make-vect x y) (make-vect y y))))
+            (set! x y)
+            (iter (+ count 1) (cons horiz-line (cons vert-line lis)) x y)))))
+  (iter 1 '() x0 0))
+
+(define (paint-graph-iter count)
+  (if (> count 4.1)
+      '()
+      (cons (graph-iteration count 0.3 100) (paint-graph-iter (+ count 0.1)))))

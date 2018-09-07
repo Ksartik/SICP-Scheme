@@ -1,0 +1,36 @@
+#lang racket
+(require sicp-pict)
+(define (make-next-point v)
+  (let ((vert1 (make-vect (/ 1 (* 2 (sqrt 3))) 0.0))
+        (vert2 (make-vect (- 1 (/ 1 (* 2 (sqrt 3)))) 0.0))
+        (vert3 (make-vect 1.0 0.5))
+        (vert4 (make-vect (/ 1 (* 2 (sqrt 3))) 1.0))
+        (vert5 (make-vect (- 1 (/ 1 (* 2 (sqrt 3)))) 1.0))
+        (vert6 (make-vect 0.0 0.5))
+        (rand (random 1 7)))
+    (cond ((= rand 1) (vector-scale 0.5 (vector-add v vert1)))
+          ((= rand 2) (vector-scale 0.5 (vector-add v vert2)))
+          ((= rand 3) (vector-scale 0.5 (vector-add v vert3)))
+          ((= rand 4) (vector-scale 0.5 (vector-add v vert4)))
+          ((= rand 5) (vector-scale 0.5 (vector-add v vert5)))
+          ((= rand 6) (vector-scale 0.5 (vector-add v vert6))))))
+
+(define random-point-hex
+  (λ()
+    (let ((x (random))
+          (y (random))
+          (a (/ 1 (* 2 (sqrt 3))))
+          (b (- 1 (/ 1 (* 2 (sqrt 3))))))
+      (cond ((and (< x a) (or (<= y (* (sqrt 3) (- a x))) (<= (- 1 y) (* (sqrt 3) (- a x))))) (random-point-hex))
+            ((and (> x b) (or (<= y (* (sqrt 3) (- x b))) (<= (- 1 y) (* (sqrt 3) (- x b))))) (random-point-hex))
+            (else (make-vect x y))))))
+
+(define (chaos-vec-list N)
+  (define (iter count vec-list v)
+    (if (> count N)
+        vec-list
+        (iter (+ count 1) (cons v vec-list) (make-next-point v))))
+  (iter 1 '() (random-point-hex)))
+
+(define (chaos-game N)
+  (paint (segments->painter (map (λ(v) (make-segment (vector-add (make-vect 0.0 0.0) v) (vector-add (make-vect 0.001 0.001) v))) (chaos-vec-list N)))))
